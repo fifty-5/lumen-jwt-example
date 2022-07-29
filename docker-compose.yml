@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+
+  lumen-jwt-example:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    tty: true
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/usr/src/lumen
+      - vendor:/usr/src/lumen/vendor
+    networks:
+      - ho-network
+
+  lumen-jwt-db:
+    image: mysql:8
+    restart: "no"
+    tty: true
+    ports:
+      - '3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: example
+    volumes:
+      - mysql:/var/lib/mysql/
+    networks:
+      - ho-network
+
+  lumen-jwt-pma:
+    restart: "no"
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8001:80'
+    environment:
+      MYSQL_USERNAME: root
+      PMA_HOST: lumen-jwt-db
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - ho-network
+
+networks:
+  ho-network:
+    driver: bridge
+
+volumes:
+  vendor:
+  mysql:
+    driver: local
